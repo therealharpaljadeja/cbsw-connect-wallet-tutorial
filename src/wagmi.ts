@@ -14,7 +14,9 @@ export const config = createConfig({
     ssr: true,
     transports: {
         // [base.id]: http(),
-        [baseSepolia.id]: http(),
+        [baseSepolia.id]: http(
+            "https://api.developer.coinbase.com/rpc/v1/base-sepolia/xbCpBPNZlgaflnfPY81NM6E2M9ApALr4"
+        ),
     },
 });
 

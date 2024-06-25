@@ -1,56 +1,64 @@
 "use client";
 
-import {
-    useAccount,
-    useConnect,
-    useDisconnect,
-    useSendTransaction,
-} from "wagmi";
+import { useAccount, useConnect, useSendTransaction } from "wagmi";
 import NFTAbi from "@/abi/NFT";
 import { encodeFunctionData } from "viem";
+import CoinbaseButton from "@/components/CoinbaseButton";
+
+const buttonStyles = {
+    background: "transparent",
+    border: "1px solid transparent",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    fontFamily: "Arial, sans-serif",
+    fontWeight: "bold",
+    fontSize: 16,
+    backgroundColor: "#0052FF",
+    padding: "10px 14px",
+    borderRadius: 10,
+};
 
 function App() {
     const account = useAccount();
-    const { connect, connectors, status, error } = useConnect();
+    const { connectors, status, error } = useConnect();
     const { address, isConnected } = useAccount();
-    const { disconnect } = useDisconnect();
-    const { sendTransaction } = useSendTransaction();
+    const {
+        sendTransaction,
+        error: mintError,
+        status: mintStatus,
+    } = useSendTransaction();
 
     async function mint() {
-        try {
-            const hash = await sendTransaction({
-                to: "0xA2bCe1b3a30Bb9f29092a3501b19FD9E55D36622",
-                data: encodeFunctionData({
-                    abi: NFTAbi,
-                    args: [
-                        address,
-                        BigInt(0),
-                        BigInt(1),
-                        "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-                        BigInt(0),
-                        {
-                            proof: [],
-                            quantityLimitPerWallet: BigInt(
-                                "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-                            ),
-                            pricePerToken: BigInt(0),
-                            currency:
-                                "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-                        },
-                        `0x`,
-                    ],
-                    functionName: "claim",
-                }),
-            });
+        const hash = await sendTransaction({
+            to: "0xA2bCe1b3a30Bb9f29092a3501b19FD9E55D36622",
+            data: encodeFunctionData({
+                abi: NFTAbi,
+                args: [
+                    address,
+                    BigInt(0),
+                    BigInt(1),
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                    BigInt(0),
+                    {
+                        proof: [],
+                        quantityLimitPerWallet: BigInt(
+                            "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+                        ),
+                        pricePerToken: BigInt(0),
+                        currency: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                    },
+                    `0x`,
+                ],
+                functionName: "claim",
+            }),
+        });
 
-            console.log(hash);
-        } catch (error) {
-            console.log(error);
-        }
+        console.log(hash);
     }
 
     return (
-        <>
+        <div style={{ padding: "20px" }}>
             <div>
                 <h2>Account</h2>
 
@@ -61,12 +69,6 @@ function App() {
                     <br />
                     chainId: {account.chainId}
                 </div>
-
-                {account.status === "connected" && (
-                    <button type="button" onClick={() => disconnect()}>
-                        Disconnect
-                    </button>
-                )}
             </div>
 
             <div>
@@ -74,12 +76,7 @@ function App() {
                 {connectors
                     .filter((connector) => connector.name === "Coinbase Wallet")
                     .map((connector) => (
-                        <button
-                            key={connector.uid}
-                            onClick={() => connect({ connector })}
-                        >
-                            {connector.name}
-                        </button>
+                        <CoinbaseButton />
                     ))}
                 <div>{status}</div>
                 <div>{error?.message}</div>
@@ -88,10 +85,14 @@ function App() {
             {isConnected ? (
                 <div>
                     <h2>Mint</h2>
-                    <button onClick={mint}>Mint</button>
+                    <button style={buttonStyles} onClick={mint}>
+                        Mint
+                    </button>
+                    <div>{mintStatus}</div>
+                    <div>{mintError?.message}</div>
                 </div>
             ) : null}
-        </>
+        </div>
     );
 }
 
