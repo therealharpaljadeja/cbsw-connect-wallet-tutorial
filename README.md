@@ -1,15 +1,17 @@
 # How to integrate Coinbase Smart Wallet into your frontend (Wagmi Template)
 
 > [!NOTE]  
-> This repository has the completed code already, below are the steps to recreate it.
+> This repository has the completed code if you are looking for instructions on using this repo jump to [Usage](#usage) section, below are the steps to recreate this project from Wagmi Template.
 
-## Initialize project using `create wagmi`
+## Tutorial
+
+### Initialize project using `create wagmi`
 
 ```bash
 npm create wagmi
 ```
 
-## Change default config to support Base network and Smart Wallet
+### Change default config to support Base network and Smart Wallet
 
 Change the config in file `src/wagmi.ts`
 
@@ -31,7 +33,7 @@ const config = createConfig({
 });
 ```
 
-## Add Coinbase Blue Connect Wallet Button (optional)
+### Add Coinbase Blue Connect Wallet Button (optional)
 
 Coinbase Blue Connect Wallet Button comprises of an additional component called `CoinbaseWalletLogo`.
 
@@ -149,4 +151,19 @@ function App() {
         </div>
     );
 }
+```
+
+## Usage
+
+1. Clone the repo
+2. Install Dependencies
+
+```bash
+npm i
+```
+
+3. Start the App
+
+```bash
+npm run dev
 ```
