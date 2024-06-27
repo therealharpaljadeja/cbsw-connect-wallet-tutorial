@@ -167,3 +167,7 @@ npm i
 ```bash
 npm run dev
 ```
+
+## Reference
+
+[Smart Wallet docs](https://www.smartwallet.dev/guides/create-app/using-wagmi)
