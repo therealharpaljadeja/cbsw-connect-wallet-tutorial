@@ -5,7 +5,7 @@ import NFTAbi from "@/abi/NFT";
 import { encodeFunctionData } from "viem";
 import CoinbaseButton from "@/components/CoinbaseButton";
 
-const buttonStyles = {
+const mintButtonStyles = {
     background: "transparent",
     border: "1px solid transparent",
     display: "flex",
@@ -36,10 +36,10 @@ function App() {
                 abi: NFTAbi,
                 args: [
                     address,
-                    BigInt(0),
-                    BigInt(1),
-                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-                    BigInt(0),
+                    BigInt(0), // tokenId
+                    BigInt(1), // quantity
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", // currency
+                    BigInt(0), // pricePerToken
                     {
                         proof: [],
                         quantityLimitPerWallet: BigInt(
@@ -48,7 +48,7 @@ function App() {
                         pricePerToken: BigInt(0),
                         currency: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
                     },
-                    `0x`,
+                    `0x`, // data
                 ],
                 functionName: "claim",
             }),
@@ -75,8 +75,8 @@ function App() {
                 <h2>Connect</h2>
                 {connectors
                     .filter((connector) => connector.name === "Coinbase Wallet")
-                    .map((connector) => (
-                        <CoinbaseButton />
+                    .map((connector, index) => (
+                        <CoinbaseButton key={index} />
                     ))}
                 <div>{status}</div>
                 <div>{error?.message}</div>
@@ -85,7 +85,7 @@ function App() {
             {isConnected ? (
                 <div>
                     <h2>Mint</h2>
-                    <button style={buttonStyles} onClick={mint}>
+                    <button style={mintButtonStyles} onClick={mint}>
                         Mint
                     </button>
                     <div>{mintStatus}</div>
