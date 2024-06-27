@@ -41,7 +41,7 @@ function App() {
     });
 
     async function mint() {
-        const hash = await writeContractsAsync({
+        await writeContractsAsync({
             contracts: [
                 {
                     address: "0xA2bCe1b3a30Bb9f29092a3501b19FD9E55D36622",

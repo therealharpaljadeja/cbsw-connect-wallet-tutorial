@@ -129,7 +129,9 @@ export default function CoinbaseButton(
 }
 ```
 
-Finally, you can use the Coinbase Blue Smart Wallet Button in your UI as follows.
+### Using Connect Button in UI
+
+If you want not implemented the `CoinbaseButton` component you can any button of your choice, just make sure to copy the code related to `wagmi` hooks.
 
 ```tsx
 import CoinbaseButton from "@/components/CoinbaseButton";
@@ -141,6 +143,9 @@ function App() {
     return (
         <div>
             <h2>Connect</h2>
+            {/* 
+                There could be many other connectors in your config, atleast the Injected one is present by default by using the below code we can make sure only Coinbase Smart Wallet is available 
+            */}
             {connectors
                 .filter((connector) => connector.name === "Coinbase Wallet")
                 .map((connector, index) => (
@@ -148,6 +153,103 @@ function App() {
                 ))}
             <div>{status}</div>
             <div>{error?.message}</div>
+        </div>
+    );
+}
+```
+
+### Prompting Transactions
+
+The `mint` function below is an example of how you can prompt transactions to the user. We are using wagmi's [`useWriteContracts`](https://wagmi.sh/react/api/hooks/useWriteContracts) hook which allows batching multiple transactions (since Coinbase Smart Wallet supports batching!)
+
+> [!NOTE] > `writeContractAsync` won't return a transaction hash instead returns a batch id when can be used to further get the batch status, more on that in the next step.
+
+```tsx
+function App() {
+    const {
+        writeContractsAsync,
+        error: mintError,
+        status: mintStatus,
+        data: id,
+    } = useWriteContracts();
+
+    // Other hooks and functions
+
+    async function mint() {
+        await writeContractsAsync({
+            contracts: [
+                {
+                    address: "<Some Token Address>",
+                    abi: parseAbi(["function mint(address, uint256)"]),
+                    args: [address, parseEther(1)],
+                    functionName: "mint",
+                },
+            ],
+        });
+    }
+
+    return (
+        <div>
+            {/* Other UI code */}
+            <button onClick={mint}>Mint</button>
+        </div>
+    );
+}
+```
+
+### Fetching batch status and transaction hash
+
+Once you have the batch id from `writeContractsAsync` or `writeContracts` you can use `useCallsStatus` hook from wagmi which can fetch the batch status along with the receipt.
+
+`useCallsStatus` returns receipts for all calls in the batch, if you are sending a single transaction the first recipt should be the receipt for your transaction.
+
+```tsx
+function App() {
+    const {
+        writeContractsAsync,
+        error: mintError,
+        status: mintStatus,
+        data: id,
+    } = useWriteContracts();
+
+    const [receipt, setReceipt] = useState(null);
+    const { data: callsStatus } = useCallsStatus({
+        id: id as string,
+        query: {
+            enabled: !!id,
+            // Poll every second until the calls are confirmed
+            refetchInterval: (data) =>
+                data.state.data?.status === "CONFIRMED" ? false : 1000,
+        },
+    });
+
+    useEffect(() => {
+        if (callStatus && callStatus.status === "CONFIRMED") {
+            let receipt = callStatus.receipts[0];
+            setReceipt(receipt);
+        }
+    }, [callStatus]);
+
+    // Other hooks and functions
+
+    async function mint() {
+        await writeContractsAsync({
+            contracts: [
+                {
+                    address: "<Some Token Address>",
+                    abi: parseAbi(["function mint(address, uint256)"]),
+                    args: [address, parseEther(1)],
+                    functionName: "mint",
+                },
+            ],
+        });
+    }
+
+    return (
+        <div>
+            {/* Other UI code */}
+            <button onClick={mint}>Mint</button>
+            {receipt ? <div>{receipt.transactionHash}</div> : null}
         </div>
     );
 }
