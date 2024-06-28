@@ -21,15 +21,19 @@ export default function TransactionStatus({
     if (callStatus.receipts) {
         let receipt = callStatus.receipts[0];
         let { transactionHash } = receipt;
+        console.log(receipt);
+
         return (
             <div>
-                Transaction Hash:{" "}
-                <Link
-                    target="_blank"
-                    href={`https://sepolia.basescan.org/tx/${transactionHash}`}
-                >
-                    {transactionHash}
-                </Link>
+                <div>
+                    Transaction Hash:{" "}
+                    <Link
+                        target="_blank"
+                        href={`https://sepolia.basescan.org/tx/${transactionHash}`}
+                    >
+                        {transactionHash}
+                    </Link>
+                </div>
             </div>
         );
     }
